@@ -1,0 +1,26 @@
+# Keil MDK 工程垃圾文件
+*.uvgui*
+*.uvoptx
+*.bak
+*.dep
+*.crf
+*.o
+*.d
+*.lst
+*.map
+*.hex
+*.bin
+*.axf
+*.elf
+*.htm
+*.sct
+
+# 系统缓存
+.DS_Store
+Thumbs.db
+*.log
+JLinkLog.txt
+
+# 临时文件
+*.tmp
+*.swp
