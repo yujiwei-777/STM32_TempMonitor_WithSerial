@@ -64,6 +64,8 @@ markdown
 | VCC  | 3.3V         |
 | GND  | GND          |
 | I/O  | **PA8**（GPIO 输出） |
+### LED
+ 绿色PB0 红色PB1
 
 ### 直流电机驱动
 - **PWM 调速**：将 PWMA连接至 **PA2**（TIM2_CH3）
