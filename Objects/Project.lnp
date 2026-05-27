@@ -34,6 +34,8 @@
 ".\objects\adc.o"
 ".\objects\serial.o"
 ".\objects\lightsensor.o"
+".\objects\motor.o"
+".\objects\pwm.o"
 ".\objects\main.o"
 ".\objects\stm32f10x_it.o"
 --strict --scatter ".\Objects\Project.sct"

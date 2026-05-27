@@ -34,3 +34,11 @@ void Buzzer_Turn(void)
 		GPIO_ResetBits(GPIOB, GPIO_Pin_12);
 	}
 }
+void Buzzer_Toggle(void)
+{
+    // ????????,????
+    if (GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_12) == 0)
+        GPIO_SetBits(GPIOB, GPIO_Pin_12);   // ????
+    else
+        GPIO_ResetBits(GPIOB, GPIO_Pin_12);  // ????
+}

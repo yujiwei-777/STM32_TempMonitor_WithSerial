@@ -9,8 +9,11 @@ void Serial_SendChar(char ch);
 void Serial_SendString(char* str);
 void Serial_SendNum(int32_t num);
 void Serial_SendFloat(float f, uint8_t decimalPlaces);
+uint8_t Serial_IsCommandReceived(void);          // ??????????
+char* Serial_GetCommand(void);                   // ???????
+void Serial_ClearCommandFlag(void);              // ??????
 
-// ???? printf,????? fputc
+// ???printf
 int fputc(int ch, FILE *f);
 
 #endif

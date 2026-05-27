@@ -1,26 +1,33 @@
 #include "Serial.h"
+#include <string.h>
 
-// ???USART1: TX=PA9, RX=PA10, ??????
+// ?????
+static char rxBuffer[64];
+static uint8_t rxIndex = 0;
+static volatile uint8_t cmdComplete = 0;   // ????????
+
+// ???USART1
 void Serial_Init(uint32_t baudrate)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
     
-    // ??USART1?GPIOA??
+    // ????
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA, ENABLE);
     
-    // ??PA9(TX)???????
+    // TX PA9
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
     
-    // ??PA10(RX)?????
+    // RX PA10
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
     
-    // USART1 ??
+    // USART??
     USART_InitStructure.USART_BaudRate = baudrate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
@@ -28,6 +35,16 @@ void Serial_Init(uint32_t baudrate)
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
     USART_Init(USART1, &USART_InitStructure);
+    
+    // ??????
+    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+    
+    // ??NVIC
+    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
     
     // ??USART1
     USART_Cmd(USART1, ENABLE);
@@ -49,7 +66,7 @@ void Serial_SendString(char* str)
     }
 }
 
-// ????(???)
+// ????
 void Serial_SendNum(int32_t num)
 {
     char buf[12];
@@ -57,7 +74,7 @@ void Serial_SendNum(int32_t num)
     Serial_SendString(buf);
 }
 
-// ?????(??????)
+// ?????(????)
 void Serial_SendFloat(float f, uint8_t decimalPlaces)
 {
     int32_t integerPart = (int32_t)f;
@@ -75,7 +92,57 @@ void Serial_SendFloat(float f, uint8_t decimalPlaces)
     }
 }
 
-// ??? printf ???
+// ????????
+uint8_t Serial_IsCommandReceived(void)
+{
+    return cmdComplete;
+}
+
+// ???????
+char* Serial_GetCommand(void)
+{
+    return rxBuffer;
+}
+
+// ??????(???????????)
+void Serial_ClearCommandFlag(void)
+{
+    cmdComplete = 0;
+}
+
+// USART1 ??????(??? stm32f10x_it.c ???,???????)
+void USART1_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
+    {
+        char ch = USART_ReceiveData(USART1);
+        
+        // ??(??,????)
+        Serial_SendChar(ch);
+        
+        // ????????,??????
+        if(ch == '\n' || ch == '\r')
+        {
+            if(rxIndex > 0)
+            {
+                rxBuffer[rxIndex] = '\0';   // ??????
+                cmdComplete = 1;             // ???????
+                rxIndex = 0;                 // ????,??????
+            }
+        }
+        else if(rxIndex < sizeof(rxBuffer) - 1)
+        {
+            rxBuffer[rxIndex++] = ch;
+        }
+        else
+        {
+            // ?????,??
+            rxIndex = 0;
+        }
+    }
+}
+
+// ???printf
 int fputc(int ch, FILE *f)
 {
     Serial_SendChar((char)ch);

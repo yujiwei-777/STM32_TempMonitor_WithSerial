@@ -1,7 +1,7 @@
 .\objects\thermistor.o: Hardware\Thermistor.c
 .\objects\thermistor.o: .\Start\stm32f10x.h
 .\objects\thermistor.o: .\Start\core_cm3.h
-.\objects\thermistor.o: C:\Users\yujiwei\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\thermistor.o: D:\k5\ARM\ARM\Bin\..\include\stdint.h
 .\objects\thermistor.o: .\Start\system_stm32f10x.h
 .\objects\thermistor.o: .\User\stm32f10x_conf.h
 .\objects\thermistor.o: .\Library\stm32f10x_adc.h
