@@ -5,9 +5,8 @@
 #include "ADC.h"
 #include "Serial.h"
 #include "Motor.h"
-#include "LED.h"
 
-// ??????
+// 温度阈值
 static uint16_t tempThreshold = 30;
 
 int main(void)
@@ -15,9 +14,8 @@ int main(void)
     OLED_Init();
     Buzzer_Init();
     ADC_Temp_Init();
-    Serial_Init(115200);      // ???,???
+    Serial_Init(115200);      // 串口初始化，波特率115200
     Motor_Init();
-    LED_Init();
 
     OLED_ShowString(1, 1, "Temp:");
     OLED_ShowString(1, 12, "C");
@@ -28,7 +26,7 @@ int main(void)
     {
         float temp = Get_Temperature();
 
-        // OLED ????(??+????)
+        // OLED 显示温度（整数+小数）
         int integer_part = (int)temp;
         int decimal_part = (int)(temp * 10) % 10;
         OLED_ShowNum(1, 6, integer_part, 2);
@@ -37,7 +35,7 @@ int main(void)
 
         uint8_t isOverTemp = (temp > tempThreshold);
 
-        // ========== ?????(???????) ==========
+        // 蜂鸣器控制
         if (isOverTemp)
         {
             Buzzer_ON();
@@ -47,31 +45,19 @@ int main(void)
             Buzzer_OFF();
         }
 
-        // ========== LED ??(???????,???;???????,???) ==========
+        // 电机控制
         if (isOverTemp)
-        {
-            LED1_OFF();     // ???
-            LED2_ON();      // ????
-        }
+            Motor_SetSpeed(70);     // 超温转速70%
         else
-        {
-            LED1_ON();      // ????
-            LED2_OFF();     // ???
-        }
+            Motor_SetSpeed(0);      // 停转
 
-        // ========== ????(????) ==========
-        if (isOverTemp)
-            Motor_SetSpeed(70);     // ????? 70%
-        else
-            Motor_SetSpeed(0);      // ??
-
-        // ========== OLED ??????? ==========
+        // OLED 显示状态
         if (isOverTemp)
             OLED_ShowString(2, 1, "Warning");
         else
             OLED_ShowString(2, 1, "Normal  ");
 
-        // ========== ??????(????) ==========
+        // 串口发送（每秒一次）
         sendCount++;
         if (sendCount >= 5)     // 200ms * 5 = 1s
         {
@@ -82,5 +68,7 @@ int main(void)
         }
 
         Delay_ms(200);
+    
     }
 }
+

@@ -35,4 +35,3 @@
 .\objects\main.o: .\Hardware\Serial.h
 .\objects\main.o: D:\k5\ARM\ARM\Bin\..\include\stdio.h
 .\objects\main.o: .\Hardware\Motor.h
-.\objects\main.o: .\Hardware\LED.h
